@@ -388,7 +388,7 @@ fn update_active_rounds_vec(active_rounds: &mut Vec<i32>, round: Round, count: C
                         active_rounds[pos] = round as i32;
                     }
                 } else {
-                    panic!(println!(
+                    std::panic::panic_any(println!(
                         "{} Adding a round that already exists in the index at {:?}",
                         BrightRed.paint("Fatal Internal Error:"),
                         round
@@ -635,7 +635,7 @@ impl DistinctIndex {
 
     pub fn is_available(&self, e: Interned, a: Interned, v: Interned) -> bool {
         if e == 0 || a == 0 || v == 0 {
-            panic!(println!(
+            std::panic::panic_any(println!(
                 "{} Can't check availability of an unformed EAV ({}, {}, {})",
                 BrightRed.paint("Fatal Internal Error:"),
                 e,
@@ -1344,7 +1344,7 @@ impl IntermediateIndex {
                         info.update_active(change.round, count);
                         !info.rounds.iter().any(|x| *x != 0) && info.active_rounds.len() == 0
                     }
-                    None => panic!(println!(
+                    None => std::panic::panic_any(println!(
                         "{} Updating active rounds for an intermediate that doesn't exist: {:?}",
                         BrightRed.paint("Fatal Internal Error:"),
                         change
@@ -1362,7 +1362,7 @@ impl IntermediateIndex {
                 unimplemented!();
             }
             None => {
-                panic!(println!(
+                std::panic::panic_any(println!(
                     "{} Updating active rounds for an intermediate that doesn't exist: {:?}",
                     BrightRed.paint("Fatal Internal Error:"),
                     change

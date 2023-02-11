@@ -3972,7 +3972,7 @@ pub struct Program {
     pub name: String,
     pub state: RuntimeState,
     pub block_info: BlockInfo,
-    watchers: HashMap<String, Box<Watcher + Send>>,
+    watchers: HashMap<String, Box<dyn Watcher + Send>>,
     pub incoming: Receiver<RunLoopMessage>,
     pub outgoing: Sender<RunLoopMessage>,
 }
@@ -4167,7 +4167,7 @@ impl Program {
             .collect()
     }
 
-    pub fn attach(&mut self, watcher: Box<Watcher + Send>) {
+    pub fn attach(&mut self, watcher: Box<dyn Watcher + Send>) {
         let name = watcher.get_name();
         println!(
             "[{}] {} {}",

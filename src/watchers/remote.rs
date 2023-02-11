@@ -227,7 +227,7 @@ impl Watcher for RemoteWatcher {
                             .map(|i| format!("{}", i))
                             .collect::<Vec<_>>()
                             .join(", ");
-                        panic!(println!(
+                        std::panic::panic_any(println!(
                             "{} Invalid remote remove: ({})",
                             BrightRed.paint("Error:"),
                             slice_string

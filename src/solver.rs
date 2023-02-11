@@ -9,9 +9,9 @@ use std::sync::Arc;
 use std::usize;
 
 pub type OutputFunc = fn(&Solver, &mut RuntimeState, &mut Frame);
-pub type AcceptFunc = Fn(&mut RuntimeState, &mut Frame, usize) -> bool;
-pub type GetIteratorFunc = Fn(&mut EstimateIter, &mut RuntimeState, &mut Frame) -> bool;
-pub type GetRoundsFunc = Fn(&mut RuntimeState, &mut Frame);
+pub type AcceptFunc = dyn Fn(&mut RuntimeState, &mut Frame, usize) -> bool;
+pub type GetIteratorFunc = dyn Fn(&mut EstimateIter, &mut RuntimeState, &mut Frame) -> bool;
+pub type GetRoundsFunc = dyn Fn(&mut RuntimeState, &mut Frame);
 
 //-------------------------------------------------------------------------
 // Input Fields
