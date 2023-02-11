@@ -12,12 +12,7 @@ Eve is a programming language based on years of research into building a human-f
 
 ### From Source
 
-Start by installing [Node](https://nodejs.org/en/download/) for your platform, and [Rust](https://www.rust-lang.org/en-US/install.html) via the `rustup` tool. Use [`rustup`](https://www.rustup.rs) to install the latest ["nightly" build of Rust](https://github.com/rust-lang-nursery/rustup.rs/blob/master/README.md#working-with-nightly-rust):
-
-```sh
-rustup install nightly
-rustup default nightly
-```
+Start by installing [Node](https://nodejs.org/en/download/) for your platform, and [Rust](https://www.rust-lang.org/en-US/install.html) via the `rustup` tool.
 
 Then clone and build the [Eve repository](https://github.com/kodowa/eve-native):
 
