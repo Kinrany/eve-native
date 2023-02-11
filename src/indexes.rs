@@ -3,15 +3,15 @@
 //-------------------------------------------------------------------------
 
 // use std::collections::HashMap;
-use ops::{
+use crate::ops::{
     AggregateFunction, Change, Count, EstimateIter, IntermediateChange, Internable, Interned,
     Interner, OutputingIter, Round, RoundHolder,
 };
 use std::cmp;
 
 extern crate fnv;
-use compiler::FunctionKind;
-use indexes::fnv::FnvHasher;
+use crate::compiler::FunctionKind;
+use crate::indexes::fnv::FnvHasher;
 use std::collections::hash_map::Entry;
 use std::collections::{btree_map, BTreeMap, BTreeSet, HashMap};
 use std::hash::BuildHasherDefault;

@@ -12,17 +12,17 @@ use unicode_segmentation::UnicodeSegmentation;
 
 use self::term_painter::Color::*;
 use self::term_painter::ToStyle;
-use combinators::{ParseResult, ParseState};
-use compiler::{make_block, parse_file, FunctionKind, Node};
-use indexes::{
+use crate::combinators::{ParseResult, ParseState};
+use crate::compiler::{make_block, parse_file, FunctionKind, Node};
+use crate::indexes::{
     AggregateEntry, CollapsedChanges, DistinctIndex, DistinctIter, HashIndex, IntermediateIndex,
     MyHasher, RawRemoteChange, RemoteChange, RemoteIndex, WatchIndex,
 };
-use parser;
+use crate::parser;
 use rand::{Rng, SeedableRng, XorShiftRng};
 use serde::de::{Deserialize, Deserializer, Visitor};
 use serde::ser::{Serialize, Serializer};
-use solver::Solver;
+use crate::solver::Solver;
 use std::cmp::{self, Eq, PartialOrd};
 use std::collections::hash_map::{DefaultHasher, Entry};
 use std::collections::{BTreeMap, Bound, HashMap, HashSet};
@@ -40,7 +40,7 @@ use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, SendError, Sender};
 use std::thread::{self, JoinHandle};
 use std::usize;
-use watchers::Watcher;
+use crate::watchers::Watcher;
 
 //-------------------------------------------------------------------------
 // Interned value

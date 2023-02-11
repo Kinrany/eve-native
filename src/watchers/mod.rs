@@ -1,9 +1,9 @@
-use indexes::WatchDiff;
-use ops::Interner;
+use crate::indexes::WatchDiff;
+use crate::ops::Interner;
 
 pub trait Watcher {
     fn get_name(&self) -> String;
-    fn set_name(&mut self, &str);
+    fn set_name(&mut self, _: &str);
     fn on_diff(&mut self, interner: &mut Interner, diff: WatchDiff);
 }
 

@@ -1,7 +1,7 @@
 use super::super::ops::{Internable, Interned, Interner, RunLoopMessage};
 use super::Watcher;
-use compiler::parse_string;
-use indexes::WatchDiff;
+use crate::compiler::parse_string;
+use crate::indexes::WatchDiff;
 use std::collections::HashMap;
 use std::sync::mpsc::Sender;
 

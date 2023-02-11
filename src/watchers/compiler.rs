@@ -3,8 +3,8 @@ use super::super::ops::{
     make_function, make_scan, Constraint, Field, Internable, Interned, Interner, RunLoopMessage,
 };
 use super::Watcher;
-use compiler::{compilation_to_blocks, Compilation};
-use indexes::WatchDiff;
+use crate::compiler::{compilation_to_blocks, Compilation};
+use crate::indexes::WatchDiff;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 use std::sync::mpsc::Sender;

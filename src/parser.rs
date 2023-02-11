@@ -1,6 +1,6 @@
-use combinators::*;
-use compiler::{Node, OutputType};
-use error::ParseError;
+use crate::combinators::*;
+use crate::compiler::{Node, OutputType};
+use crate::error::ParseError;
 use std::str::FromStr;
 
 //--------------------------------------------------------------------

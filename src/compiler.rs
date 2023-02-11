@@ -5,14 +5,14 @@ extern crate walkdir;
 use self::term_painter::Color::*;
 use self::term_painter::ToStyle;
 use self::walkdir::WalkDir;
-use combinators::{ParseResult, ParseState, Span, EMPTY_SPAN};
-use error::{self, report_errors, CompileError};
-use ops::{
+use crate::combinators::{ParseResult, ParseState, Span, EMPTY_SPAN};
+use crate::error::{self, report_errors, CompileError};
+use crate::ops::{
     make_aggregate, make_anti_scan, make_commit_lookup, make_filter, make_function,
     make_intermediate_insert, make_intermediate_scan, make_multi_function, make_remote_lookup,
     make_scan, register, Block, Constraint, Field, Internable, Interner,
 };
-use parser::{block, embedded_blocks};
+use crate::parser::{block, embedded_blocks};
 use std::cmp::{self};
 use std::collections::hash_map::Entry;
 use std::collections::hash_map::RandomState;

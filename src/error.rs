@@ -2,8 +2,8 @@ extern crate term_painter;
 
 use self::term_painter::Color::*;
 use self::term_painter::ToStyle;
-use combinators::{ParseResult, Pos, Span};
-use compiler::Node;
+use crate::combinators::{ParseResult, Pos, Span};
+use crate::compiler::Node;
 use std::fmt;
 
 #[derive(Debug, Clone, Copy)]

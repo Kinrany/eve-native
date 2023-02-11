@@ -1,6 +1,6 @@
-use compiler::FunctionKind;
-use indexes::{RemoteChangeField, WatchIndex};
-use ops::*;
+use crate::compiler::FunctionKind;
+use crate::indexes::{RemoteChangeField, WatchIndex};
+use crate::ops::*;
 use std::collections::HashSet;
 use std::fmt;
 use std::hash::{Hash, Hasher};

@@ -143,10 +143,10 @@ pub trait TaggedMath {
     fn mantissa(self) -> i64;
     fn is_negative(self) -> bool;
     fn negate(self) -> Tagged;
-    fn add(self, Tagged) -> Tagged;
-    fn sub(self, Tagged) -> Tagged;
-    fn multiply(self, Tagged) -> Tagged;
-    fn divide(self, Tagged) -> Tagged;
+    fn add(self, _: Tagged) -> Tagged;
+    fn sub(self, _: Tagged) -> Tagged;
+    fn multiply(self, _: Tagged) -> Tagged;
+    fn divide(self, _: Tagged) -> Tagged;
     fn to_string(self) -> String;
     fn to_float(self) -> f64;
 }
