@@ -73,12 +73,10 @@ fn main() {
     );
 
     let mut runner = ProgramRunner::new("main");
-    matches.value_of("debug").map(|mode_name| {
-        runner.debug(match mode_name {
+    if let Some(mode_name) = matches.value_of("debug") { runner.debug(match mode_name {
             "compile" => DebugMode::Compile,
             _ => panic!("Unknown debug mode '{:?}'.", mode_name),
-        })
-    });
+        }) }
 
     let outgoing = runner.program.outgoing.clone();
     if !clean {
@@ -87,7 +85,7 @@ fn main() {
             .attach(Box::new(SystemTimerWatcher::new(outgoing.clone())));
         runner
             .program
-            .attach(Box::new(FileWatcher::new(outgoing.clone())));
+            .attach(Box::new(FileWatcher::new(outgoing)));
         runner.program.attach(Box::new(ConsoleWatcher::new()));
         runner.program.attach(Box::new(PrintDiffWatcher::new()));
         runner.program.attach(Box::new(PanicWatcher::new()));

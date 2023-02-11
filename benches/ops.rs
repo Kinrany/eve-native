@@ -84,7 +84,7 @@ pub fn ops_bind_solver(b: &mut Bencher) {
 }
 
 #[bench]
-fn bench_simple_gj(b: &mut Bencher) {
+fn bench_simple_gj(_b: &mut Bencher) {
     // prog.block("simple block", ({find, record, lib}) => {
     //  let person = find("person");
     //  let text = `name: ${person.name}`;

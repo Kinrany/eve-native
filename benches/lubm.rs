@@ -4,7 +4,7 @@ extern crate eve;
 extern crate test;
 extern crate time;
 
-use eve::ops::{make_scan, register, Block, Constraint, Program};
+use eve::ops::{Program};
 use std::collections::HashMap;
 use std::num::Wrapping;
 use test::Bencher;
@@ -42,7 +42,7 @@ use test::Bencher;
 
 fn rand(rseed: &mut u32) -> u32 {
     *rseed = ((Wrapping(*rseed) * Wrapping(1103515245) + Wrapping(12345)) & Wrapping(0x7fffffff)).0;
-    return *rseed;
+    *rseed
 }
 
 fn rand_between(rseed: &mut u32, from: u32, to: u32) -> u32 {
@@ -53,9 +53,9 @@ fn rand_between(rseed: &mut u32, from: u32, to: u32) -> u32 {
 
 fn eav(program: &mut Program, eavs: &mut Vec<(u32, u32, u32)>, e: &str, a: &str, v: &str) {
     eavs.push((
-        program.state.interner.string_id(&e),
-        program.state.interner.string_id(&a),
-        program.state.interner.string_id(&v),
+        program.state.interner.string_id(e),
+        program.state.interner.string_id(a),
+        program.state.interner.string_id(v),
     ))
 }
 
@@ -69,18 +69,18 @@ fn make_faculty(
     publications: u32,
     course_ix: &mut u32,
     grad_course_ix: &mut u32,
-    mut seed: &mut u32,
+    seed: &mut u32,
     prof_to_pubs: &mut HashMap<String, u32>,
 ) {
-    let prof = format!("{}|{}{}", department, cur_type, ix);
+    let prof = format!("{department}|{cur_type}{ix}");
     eav(program, eavs, &prof, "tag", cur_type);
     eav(program, eavs, &prof, "works-for", department);
-    eav(program, eavs, &prof, "name", &format!("{}|name", prof));
-    eav(program, eavs, &prof, "email", &format!("{}@foo.edu", prof));
+    eav(program, eavs, &prof, "name", &format!("{prof}|name"));
+    eav(program, eavs, &prof, "email", &format!("{prof}@foo.edu"));
     eav(program, eavs, &prof, "telephone", "123-123-1234");
     eav(program, eavs, &prof, "research-interest", "blah");
     // every Faculty is teacherOf 1~2 Courses
-    for _ in 0..rand_between(&mut seed, 1, 2) {
+    for _ in 0..rand_between(seed, 1, 2) {
         let course = format!("{}|course{}", department, *course_ix);
         eav(program, eavs, &course, "tag", "course");
         eav(program, eavs, &course, "name", "foo");
@@ -88,7 +88,7 @@ fn make_faculty(
         *course_ix += 1;
     }
     // every Faculty is teacherOf 1~2 GraduateCourses
-    for _ in 0..rand_between(&mut seed, 1, 2) {
+    for _ in 0..rand_between(seed, 1, 2) {
         let course = format!("{}|graduate_course{}", department, *grad_course_ix);
         eav(program, eavs, &course, "tag", "graduate-course");
         eav(program, eavs, &course, "name", "foo");
@@ -97,37 +97,37 @@ fn make_faculty(
     }
     prof_to_pubs.insert(prof.to_string(), publications);
     for pub_ix in 0..publications {
-        let publication = format!("{}|publication{}", prof, pub_ix);
+        let publication = format!("{prof}|publication{pub_ix}");
         eav(program, eavs, &publication, "tag", "publication");
         eav(program, eavs, &publication, "name", "foo");
         eav(program, eavs, &publication, "author", &prof);
     }
     // every Faculty has an undergraduateDegreeFrom a University, a mastersDegreeFrom a University, and a doctoralDegreeFrom a University
-    let ugrad = rand_between(&mut seed, 0, university_count as u32);
+    let ugrad = rand_between(seed, 0, university_count as u32);
     eav(
         program,
         eavs,
         &prof,
         "undergraduate-degree-from",
-        &format!("university{:?}", ugrad),
+        &format!("university{ugrad:?}"),
     );
 
-    let masters = rand_between(&mut seed, 0, university_count as u32);
+    let masters = rand_between(seed, 0, university_count as u32);
     eav(
         program,
         eavs,
         &prof,
         "masters-degree-from",
-        &format!("university{:?}", masters),
+        &format!("university{masters:?}"),
     );
 
-    let phd = rand_between(&mut seed, 0, university_count as u32);
+    let phd = rand_between(seed, 0, university_count as u32);
     eav(
         program,
         eavs,
         &prof,
         "doctoral-degree-from",
-        &format!("university{:?}", phd),
+        &format!("university{phd:?}"),
     );
 }
 
@@ -154,7 +154,7 @@ fn random_professor(
         }
         _ => panic!("bad professor type"),
     };
-    format!("{}|{}{}", department, prof_type, id)
+    format!("{department}|{prof_type}{id}")
 }
 
 fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u32)> {
@@ -163,13 +163,13 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
     let mut seed = 0;
     let mut prof_to_pubs = HashMap::new();
     for university_ix in 0..university_count {
-        let university = format!("university{}", university_ix);
+        let university = format!("university{university_ix}");
         eav(program, &mut eavs, &university, "tag", "university");
 
         // 15~25 Departments are subOrgnization of the University
         let department_count = rand_between(&mut seed, 10, 25);
         for department_ix in 0..department_count {
-            let department = format!("{}|department{}", university, department_ix);
+            let department = format!("{university}|department{department_ix}");
             eav(program, &mut eavs, &department, "tag", "department");
             eav(
                 program,
@@ -205,7 +205,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
 
             // one of the FullProfessors is headOf the Department
             let head = rand_between(&mut seed, 0, full_professors_count);
-            let prof = format!("{}|full_professor{}", department, head);
+            let prof = format!("{department}|full_professor{head}");
             eav(program, &mut eavs, &prof, "head of", &department);
 
             // 10~14 AssociateProfessors worksFor the Department
@@ -274,7 +274,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
             // 10~20 ResearchGroups are subOrgnization of the Department
             let research_group_count = rand_between(&mut seed, 10, 20);
             for rg_ix in 0..research_group_count {
-                let group = format!("{}|research_group{}", department, rg_ix);
+                let group = format!("{department}|research_group{rg_ix}");
                 eav(program, &mut eavs, &group, "tag", "research-group");
                 eav(
                     program,
@@ -292,7 +292,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
                 counter += undergrads_count;
             }
             for ug_ix in 0..undergrads_count {
-                let undergrad = format!("{}|undergrad{}", department, ug_ix);
+                let undergrad = format!("{department}|undergrad{ug_ix}");
                 eav(
                     program,
                     &mut eavs,
@@ -305,14 +305,14 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
                     &mut eavs,
                     &undergrad,
                     "name",
-                    &format!("{}|name", undergrad),
+                    &format!("{undergrad}|name"),
                 );
                 eav(
                     program,
                     &mut eavs,
                     &undergrad,
                     "email",
-                    &format!("{}@foo.edu", undergrad),
+                    &format!("{undergrad}@foo.edu"),
                 );
                 eav(program, &mut eavs, &undergrad, "telephone", "123-123-1234");
                 // every Student is memberOf the Department
@@ -326,7 +326,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
                         &mut eavs,
                         &undergrad,
                         "takes-course",
-                        &format!("{}|course{}", department, undergrad_course_ix),
+                        &format!("{department}|course{undergrad_course_ix}"),
                     );
                 }
                 // 1/5 of the UndergraduateStudents have a Professor as their advisor
@@ -347,15 +347,15 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
             let grads_count = rand_between(&mut seed, 3, 4) * total_faculty;
             // @TODO this should be grads_count
             for g_ix in 0..grads_count {
-                let grad = format!("{}|graduate{}", department, g_ix);
+                let grad = format!("{department}|graduate{g_ix}");
                 eav(program, &mut eavs, &grad, "tag", "graduate-student");
-                eav(program, &mut eavs, &grad, "name", &format!("{}|name", grad));
+                eav(program, &mut eavs, &grad, "name", &format!("{grad}|name"));
                 eav(
                     program,
                     &mut eavs,
                     &grad,
                     "email",
-                    &format!("{}@foo.edu", grad),
+                    &format!("{grad}@foo.edu"),
                 );
                 eav(program, &mut eavs, &grad, "telephone", "123-123-1234");
                 // if department_ix == 0 {
@@ -372,7 +372,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
                         &mut eavs,
                         &grad,
                         "takes-course",
-                        &format!("{}|graduate_course{}", department, course_ix),
+                        &format!("{department}|graduate_course{course_ix}"),
                     );
                 }
                 // every GraduateStudent has a Professor as his advisor
@@ -391,7 +391,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
                     &mut eavs,
                     &grad,
                     "undergraduate-degree-from",
-                    &format!("university{:?}", degree),
+                    &format!("university{degree:?}"),
                 );
                 // @TODO
                 // every GraduateStudent co-authors 0~5 Publications with some Professors
@@ -406,7 +406,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
                     );
                     let pub_ix =
                         rand_between(&mut seed, 0, *prof_to_pubs.get(&prof.to_string()).unwrap());
-                    let publication = format!("{}|publication{}", prof, pub_ix);
+                    let publication = format!("{prof}|publication{pub_ix}");
                     eav(program, &mut eavs, &publication, "author", &grad);
                 }
                 // 1/5~1/4 of the GraduateStudents are chosen as TeachingAssistant for one Course
@@ -417,7 +417,7 @@ fn generate(program: &mut Program, university_count: usize) -> Vec<(u32, u32, u3
                         &mut eavs,
                         &grad,
                         "teaching-assistant-for",
-                        &format!("{}|course{}", department, course),
+                        &format!("{department}|course{course}"),
                     );
                 }
                 // 1/4~1/3 of the GraduateStudents are chosen as ResearchAssistant

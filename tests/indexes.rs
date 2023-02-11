@@ -138,7 +138,7 @@ fn test_distinct(counts: Vec<(u32, i32)>, expected: Vec<(u32, i32)>) {
     }
     let mut iter = distinct_changes.iter();
     while let Some(distinct) = iter.next(&mut distinct_changes) {
-        println!("distinct: {:?}", distinct);
+        println!("distinct: {distinct:?}");
         let cur = if final_results.contains_key(&distinct.round) {
             final_results[&distinct.round]
         } else {
@@ -149,10 +149,8 @@ fn test_distinct(counts: Vec<(u32, i32)>, expected: Vec<(u32, i32)>) {
             if distinct_index.insert_active(distinct.e, distinct.a, distinct.v, distinct.round) {
                 index.insert(distinct.e, distinct.a, distinct.v);
             }
-        } else {
-            if distinct_index.remove_active(distinct.e, distinct.a, distinct.v, distinct.round) {
-                index.remove(distinct.e, distinct.a, distinct.v);
-            }
+        } else if distinct_index.remove_active(distinct.e, distinct.a, distinct.v, distinct.round) {
+            index.remove(distinct.e, distinct.a, distinct.v);
         }
     }
 
@@ -170,7 +168,7 @@ fn test_distinct(counts: Vec<(u32, i32)>, expected: Vec<(u32, i32)>) {
         );
     }
 
-    println!("final {:?}", final_results);
+    println!("final {final_results:?}");
 
     let mut expected_map = HashMap::new();
     for &(round, count) in expected.iter() {
@@ -189,7 +187,7 @@ fn test_distinct(counts: Vec<(u32, i32)>, expected: Vec<(u32, i32)>) {
     }
 
     for (round, count) in final_results.iter() {
-        let valid = match expected_map.get(&round) {
+        let valid = match expected_map.get(round) {
             Some(&actual) => actual == *count,
             None => *count == 0,
         };
@@ -197,7 +195,7 @@ fn test_distinct(counts: Vec<(u32, i32)>, expected: Vec<(u32, i32)>) {
             valid,
             "round {:?} :: expected {:?}, actual {:?}",
             round,
-            expected_map.get(&round),
+            expected_map.get(round),
             count
         );
     }
@@ -523,11 +521,11 @@ fn test_anti_distinct(
     expected: Vec<(u32, i32)>,
 ) {
     let left_counts = round_counts_to_distinct_counts(&left);
-    println!("LEFT COUNTS {:?}", left_counts);
+    println!("LEFT COUNTS {left_counts:?}");
     let left_iter = DistinctIter::new(&left_counts);
     let left_iter2 = DistinctIter::new(&left_counts);
     for (round, count) in left_iter2 {
-        println!("left: {:?} {:?}", round, count);
+        println!("left: {round:?} {count:?}");
     }
     let right_counts = round_counts_to_distinct_counts(&right);
     let right_iter = DistinctIter::new(&right_counts);

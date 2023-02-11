@@ -5,7 +5,7 @@ extern crate eve;
 extern crate test;
 extern crate time;
 
-use eve::ops::{Internable, Program};
+use eve::ops::{Program};
 use test::Bencher;
 
 pub fn load(program: &mut Program) {

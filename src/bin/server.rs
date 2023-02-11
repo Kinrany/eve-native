@@ -99,7 +99,7 @@ impl ClientHandler {
         router
             .lock()
             .expect("ERROR: Failed to lock router: Cannot register new client.")
-            .register(&client_name, outgoing.clone());
+            .register(client_name, outgoing.clone());
         if !eve_flags.clean {
             runner
                 .program
@@ -112,7 +112,7 @@ impl ClientHandler {
                 .attach(Box::new(RawTextCompilerWatcher::new(outgoing.clone())));
             runner
                 .program
-                .attach(Box::new(FileWatcher::new(outgoing.clone())));
+                .attach(Box::new(FileWatcher::new(outgoing)));
             runner.program.attach(Box::new(WebsocketClientWatcher::new(
                 out.clone(),
                 client_name,
@@ -121,7 +121,7 @@ impl ClientHandler {
             runner.program.attach(Box::new(PanicWatcher::new()));
             runner.program.attach(Box::new(RemoteWatcher::new(
                 client_name,
-                &router
+                router
                     .lock()
                     .expect("ERROR: Failed to lock router: Cannot init RemoteWatcher.")
                     .deref(),
@@ -172,7 +172,7 @@ impl ClientHandler {
             let mut watcher:RecommendedWatcher = match Watcher::new(outgoing, Duration::from_secs(1)) {
                 Ok(w) => w,
                 Err(e) => {
-                    panic!(println!("{} Unable to monitor files for hot-reloading due to error:\n{}", BrightRed.paint("Fatal Error:"), e));
+                    std::panic::panic_any(println!("{} Unable to monitor files for hot-reloading due to error:\n{}", BrightRed.paint("Fatal Error:"), e));
                 }
             };
 
@@ -180,7 +180,7 @@ impl ClientHandler {
                 match watcher.watch(path, RecursiveMode::Recursive) {
                     Ok(_) => (),
                     Err(e) => {
-                        panic!(println!("{} Could not watch standard library source due to error:\n{}", BrightRed.paint("Error:"), e));
+                        std::panic::panic_any(println!("{} Could not watch standard library source due to error:\n{}", BrightRed.paint("Error:"), e));
                     }
                 };
             }
@@ -236,7 +236,7 @@ impl ClientHandler {
                             }
                         };
                     },
-                    Err(err) => println!("ERROR: {:?}", err)
+                    Err(err) => println!("ERROR: {err:?}")
                 }
             }
         });
@@ -289,7 +289,7 @@ impl Handler for ClientHandler {
     }
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {
-        println!("WebSocket closing for ({:?}) {}", code, reason);
+        println!("WebSocket closing for ({code:?}) {reason}");
         self.router.lock().unwrap().unregister(&self.client_name);
         self.running.close();
     }
@@ -361,7 +361,7 @@ fn websocket_server(address: String, eve_paths: &EvePaths, eve_flags: &EveFlags)
         runner.program.attach(Box::new(PanicWatcher::new()));
         runner.program.attach(Box::new(RemoteWatcher::new(
             "server",
-            &router.lock().unwrap().deref(),
+            router.lock().unwrap().deref(),
         )));
     }
 
@@ -380,7 +380,7 @@ fn websocket_server(address: String, eve_paths: &EvePaths, eve_flags: &EveFlags)
 
     match listen(address, |out| {
         ix += 1;
-        let client_name = format!("ws_client_{}", ix);
+        let client_name = format!("ws_client_{ix}");
         ClientHandler::new(&client_name, out, router.clone(), eve_paths, eve_flags)
     }) {
         Ok(_) => {}
@@ -482,7 +482,7 @@ fn main() {
         )
         .get_matches();
 
-    println!("");
+    println!();
 
     let eve_flags = EveFlags {
         clean: matches.is_present("clean"),
@@ -506,8 +506,8 @@ fn main() {
     let wport = matches.value_of("port").unwrap_or("3012");
     let hport = matches.value_of("http-port").unwrap_or("8081");
     let address = matches.value_of("address").unwrap_or("127.0.0.1");
-    let http_address = format!("{}:{}", address, hport);
-    let websocket_address = format!("{}:{}", address, wport);
+    let http_address = format!("{address}:{hport}");
+    let websocket_address = format!("{address}:{wport}");
 
     http_server(http_address);
     websocket_server(websocket_address, &eve_paths, &eve_flags);

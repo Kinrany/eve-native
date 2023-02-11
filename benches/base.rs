@@ -9,11 +9,11 @@ use test::Bencher;
 
 fn make_program(paths: Vec<&str>) -> Program {
     let mut program = Program::new();
-    let mut iter_pool = EstimateIterPool::new();
+    let _iter_pool = EstimateIterPool::new();
 
     let mut blocks = vec![];
     for path in paths {
-        blocks.extend(parse_file(&mut program.state.interner, &path, false, false));
+        blocks.extend(parse_file(&mut program.state.interner, path, false, false));
     }
 
     let mut txn = CodeTransaction::new();
