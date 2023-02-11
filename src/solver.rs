@@ -616,7 +616,7 @@ impl Solver {
             }
             iterator.constraint
         };
-        'main: while { pool.get(ix).iter.next(&mut frame.row, ix) } {
+        'main: while pool.get(ix).iter.next(&mut frame.row, ix) {
             for accept in self.accepts.iter() {
                 if !(*accept)(state, frame, active_constraint) {
                     continue 'main;

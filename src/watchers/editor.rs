@@ -13,7 +13,7 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::mpsc::{self, Sender};
 use std::sync::{Arc, Mutex};
-use std::thread::{self, JoinHandle};
+use std::thread::{self};
 
 use super::compiler::CompilerWatcher;
 use super::console::ConsoleWatcher;

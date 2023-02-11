@@ -1011,7 +1011,7 @@ impl<'a> Node<'a> {
                             .map(|x| cur_block.get_register_value(x))
                     })
                     .collect();
-                for (out_ix, mut attr_output) in cur_outputs.iter_mut().enumerate() {
+                for (out_ix, attr_output) in cur_outputs.iter_mut().enumerate() {
                     let cur_value = cur_block.get_register_value(attr_output.clone());
                     let maybe_output = compiled_outputs.get(out_ix).map(|x| x.unwrap());
                     match (&cur_value, maybe_output) {
@@ -2485,8 +2485,8 @@ pub fn compilation_to_blocks(
     let mut subs: Vec<&mut SubBlock> = comp.sub_blocks.iter_mut().collect();
     while subs.len() > 0 {
         let sub_name = format!("{}|sub_block|{}", block_name, sub_ix);
-        let mut cur = subs.pop().unwrap();
-        let mut sub_comp = cur.get_mut_compilation();
+        let cur = subs.pop().unwrap();
+        let sub_comp = cur.get_mut_compilation();
         if sub_comp.constraints.len() > 0 {
             sub_comp.finalize();
             if debug {

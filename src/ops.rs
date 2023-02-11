@@ -19,28 +19,28 @@ use crate::indexes::{
     MyHasher, RawRemoteChange, RemoteChange, RemoteIndex, WatchIndex,
 };
 use crate::parser;
+use crate::solver::Solver;
+use crate::watchers::Watcher;
 use rand::{Rng, SeedableRng, XorShiftRng};
 use serde::de::{Deserialize, Deserializer, Visitor};
 use serde::ser::{Serialize, Serializer};
-use crate::solver::Solver;
 use std::cmp::{self, Eq, PartialOrd};
 use std::collections::hash_map::{DefaultHasher, Entry};
 use std::collections::{BTreeMap, Bound, HashMap, HashSet};
 use std::error::Error;
 use std::f32::consts::PI;
 use std::fmt;
-use std::fs::{canonicalize, File, OpenOptions};
+use std::fs::{File, OpenOptions};
 use std::hash::{Hash, Hasher};
 use std::io::{BufReader, BufWriter, Write};
 use std::iter::{FromIterator, Iterator};
 use std::mem;
 use std::mem::transmute;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::mpsc;
-use std::sync::mpsc::{Receiver, SendError, Sender};
+use std::sync::mpsc::{Receiver, Sender};
 use std::thread::{self, JoinHandle};
 use std::usize;
-use crate::watchers::Watcher;
 
 //-------------------------------------------------------------------------
 // Interned value
@@ -309,7 +309,7 @@ impl Block {
                     let actual_a = if let &Field::Value(val) = a { val } else { 0 };
                     let actual_v = if let &Field::Value(val) = v { val } else { 0 };
                     if actual_a == tag && actual_v != 0 {
-                        let mut tags = tag_mappings.entry(e.clone()).or_insert_with(|| vec![]);
+                        let tags = tag_mappings.entry(e.clone()).or_insert_with(|| vec![]);
                         tags.push(actual_v);
                     }
                 }
@@ -2133,7 +2133,7 @@ pub fn make_register_mask(fields: Vec<&Field>) -> u64 {
     let mut mask = 0;
     for field in fields {
         match field {
-            &Field::Register(r) => mask = set_bit(mask, (r % 64)),
+            &Field::Register(r) => mask = set_bit(mask, r % 64),
             _ => {}
         }
     }
@@ -5451,7 +5451,7 @@ impl ProgramRunner {
                             let resolved_path = resolved.to_str().unwrap();
                             println!("Hot-reloading {} ...", resolved_path);
 
-                            let mut parsed_blocks:Vec<Block> = if resolved.exists() {
+                            let parsed_blocks:Vec<Block> = if resolved.exists() {
                                 parse_file(&mut program.state.interner, resolved_path, true, debug_compile)
                             } else {
                                 vec![]
@@ -5470,7 +5470,7 @@ impl ProgramRunner {
 
                         echo_channel.send(RunLoopMessage::CodeTransaction(added_blocks, removed_blocks));
                     }
-                    (Ok(RunLoopMessage::Transaction(v)), true) => {},
+                    (Ok(RunLoopMessage::Transaction(_v)), true) => {},
                     (Ok(RunLoopMessage::Transaction(v)), false) => {
                         println!("[{}] Txn started", &program.name);
                         let start_ns = time::precise_time_ns();
@@ -5493,7 +5493,7 @@ impl ProgramRunner {
                         let time = (end_ns - start_ns) as f64;
                         println!("[{}] Txn took {:?} - {:?} insts ({:?} ns) - {:?} inserts ({:?} ns)", &program.name, time / 1_000_000.0, txn.frame.counters.instructions, (time / (txn.frame.counters.instructions as f64)).floor(), txn.frame.counters.inserts, (time / (txn.frame.counters.inserts as f64)).floor());
                     }
-                    (Ok(RunLoopMessage::RemoteTransaction(v)), true) => {},
+                    (Ok(RunLoopMessage::RemoteTransaction(_v)), true) => {},
                     (Ok(RunLoopMessage::RemoteTransaction(v)), false) => {
                         let start_ns = time::precise_time_ns();
                         println!("[{}] Remote txn started", &program.name);

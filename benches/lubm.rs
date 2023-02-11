@@ -4,7 +4,7 @@ extern crate eve;
 extern crate test;
 extern crate time;
 
-use eve::ops::{Program};
+use eve::ops::Program;
 use std::collections::HashMap;
 use std::num::Wrapping;
 use test::Bencher;

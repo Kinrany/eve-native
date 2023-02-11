@@ -110,9 +110,7 @@ impl ClientHandler {
             runner
                 .program
                 .attach(Box::new(RawTextCompilerWatcher::new(outgoing.clone())));
-            runner
-                .program
-                .attach(Box::new(FileWatcher::new(outgoing)));
+            runner.program.attach(Box::new(FileWatcher::new(outgoing)));
             runner.program.attach(Box::new(WebsocketClientWatcher::new(
                 out.clone(),
                 client_name,

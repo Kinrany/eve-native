@@ -53,7 +53,7 @@ impl Watcher for RawTextCompilerWatcher {
         for add in diff.adds {
             if let Internable::String(ref kind) = interner.get_value(add[0]).clone() {
                 match (kind.as_ref(), &add[1..]) {
-                    ("to-blocks", &[id, path, code]) => match interner.get_value(code).clone() {
+                    ("to-blocks", &[_id, path, code]) => match interner.get_value(code).clone() {
                         Internable::String(ref s) => {
                             let blocks = parse_string(interner, s, &path.to_string(), false);
                             let mut changes = vec![];

@@ -1,9 +1,7 @@
 extern crate serde_json;
 
 use super::super::indexes::{RawRemoteChange, WatchDiff};
-use super::super::ops::{
-    s, Internable, Interned, Interner, JSONInternable, RawChange, RunLoopMessage,
-};
+use super::super::ops::{s, Internable, Interned, Interner, RawChange, RunLoopMessage};
 use super::Watcher;
 
 use std::collections::HashMap;
@@ -13,7 +11,6 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 
 extern crate ws;
-use self::ws::Message;
 
 extern crate term_painter;
 use self::term_painter::Color::*;

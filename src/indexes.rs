@@ -13,7 +13,7 @@ extern crate fnv;
 use crate::compiler::FunctionKind;
 use crate::indexes::fnv::FnvHasher;
 use std::collections::hash_map::Entry;
-use std::collections::{btree_map, BTreeMap, BTreeSet, HashMap};
+use std::collections::{btree_map, BTreeMap, HashMap};
 use std::hash::BuildHasherDefault;
 use std::iter::{self, repeat, Iterator};
 
@@ -438,7 +438,7 @@ impl HashIndex {
     pub fn insert(&mut self, e: Interned, a: Interned, v: Interned) -> bool {
         let added = match self.a.entry(a) {
             Entry::Occupied(mut o) => {
-                let mut level = o.get_mut();
+                let level = o.get_mut();
                 level.insert(e, v)
             }
             Entry::Vacant(o) => {
@@ -457,7 +457,7 @@ impl HashIndex {
     pub fn remove(&mut self, e: Interned, a: Interned, v: Interned) -> bool {
         let removed = match self.a.entry(a) {
             Entry::Occupied(mut o) => {
-                let mut level = o.get_mut();
+                let level = o.get_mut();
                 level.remove(e, v)
             }
             Entry::Vacant(_) => false,
@@ -1243,7 +1243,7 @@ impl IntermediateIndex {
                         // [2], depending on the order we receive the adds/removes, we might end up
                         // with no [foo, bar] key at all.
                         projection.extend(value.iter().cloned());
-                        let debug_cause = projection[0].clone();
+                        let _debug_cause = projection[0].clone();
                         // Insert it into the items btree
                         match items.entry(projection) {
                             btree_map::Entry::Occupied(ref mut ent) => {
@@ -1361,13 +1361,11 @@ impl IntermediateIndex {
             Some(&mut IntermediateLevel::SortAggregate(..)) => {
                 unimplemented!();
             }
-            None => {
-                std::panic::panic_any(println!(
-                    "{} Updating active rounds for an intermediate that doesn't exist: {:?}",
-                    BrightRed.paint("Fatal Internal Error:"),
-                    change
-                ))
-            }
+            None => std::panic::panic_any(println!(
+                "{} Updating active rounds for an intermediate that doesn't exist: {:?}",
+                BrightRed.paint("Fatal Internal Error:"),
+                change
+            )),
         };
         if should_remove {
             self.index.remove(key);
