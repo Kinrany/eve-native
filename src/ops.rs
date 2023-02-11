@@ -5256,7 +5256,7 @@ impl Persister {
                     PersisterMessage::Write(items) => {
                         println!("Let's persist some stuff!");
                         for item in items {
-                            let result = bincode::serialize(&item, bincode::Infinite).unwrap();
+                            let result = bincode::serialize(&item).unwrap();
                             match writer.write_all(&result) {
                                 Err(e) => {
                                     panic!("Can't persist! {:?}", e);
@@ -5286,8 +5286,7 @@ impl Persister {
         };
         let mut reader = BufReader::new(file);
         loop {
-            let result: Result<RawChange, _> =
-                bincode::deserialize_from(&mut reader, bincode::Infinite);
+            let result: Result<RawChange, _> = bincode::deserialize_from(&mut reader);
             match result {
                 Ok(c) => {
                     println!("{:?}", c);
