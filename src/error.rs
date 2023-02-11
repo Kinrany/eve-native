@@ -19,25 +19,25 @@ pub enum ParseError {
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            &ParseError::EmptySearch => {
+            Self::EmptySearch => {
                 write!(f, "This block has an empty search. If you want a block to run\n unconditionally, you can omit the search section.")
             }
-            &ParseError::EmptyUpdate => {
+            Self::EmptyUpdate => {
                 write!(f, "This block doesn't have any actions in it.")
             }
-            &ParseError::InvalidBlock => {
+            Self::InvalidBlock => {
                 write!(f, "This block is invalid, but unfortunately I don't have a lot of information about why.")
             }
-            &ParseError::MissingEnd => {
+            Self::MissingEnd => {
                 write!(f, "The `end` keyword is missing for this block.")
             }
-            &ParseError::MissingUpdate => {
+            Self::MissingUpdate => {
                 write!(
                     f,
                     "This block is missing either a `bind` or `commit` section."
                 )
             }
-            &ParseError::NumberOverflow() => {
+            Self::NumberOverflow() => {
                 write!(f, "This block contains a number too large or small to represent with the numeric datatype in use.")
             }
         }
@@ -63,51 +63,51 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            &Error::InvalidNeedle => {
+            Self::InvalidNeedle => {
                 write!(f, "The `from` in a sorted aggregate has to be the same size as the `for` in order to match the values.")
             }
-            &Error::InvalidLookupType => {
+            Self::InvalidLookupType => {
                 write!(
                     f,
                     "Lookup can only have \"add\" or \"remove\" for its type field."
                 )
             }
-            &Error::Unprovided(ref var) => {
+            Self::Unprovided(ref var) => {
                 write!(f, "Nothing in the block is providing `{}`. You can search for\n something that provides `{}`, or bind a constant.\n e.g. `{}: \"Hello\"`", var, var, var)
             }
-            &Error::UnknownFunction(ref func) => {
+            Self::UnknownFunction(ref func) => {
                 write!(
                     f,
                     "I don't know the `{}` function, so I'm not sure what to execute.",
                     func
                 )
             }
-            &Error::UnknownFunctionParam(ref func, ref param) => {
+            Self::UnknownFunctionParam(ref func, ref param) => {
                 write!(
                     f,
                     "The `{}` function doesn't have a `{}` attribute.",
                     func, param
                 )
             }
-            &Error::ParseError(ref err) => {
+            Self::ParseError(ref err) => {
                 write!(f, "{}", err)
             }
         }
     }
 }
 
-fn format_error_source(span: &Span, lines: &Vec<&str>) {
+fn format_error_source(span: &Span, lines: &[&str]) {
     let start = &span.start;
     let stop = &span.stop;
     let start_line = start.line;
     let stop_line = stop.line;
     let mut line_marker = String::new();
-    for line_ix in start_line..stop_line + 1 {
+    (start_line..stop_line + 1).for_each(|line_ix| {
         line_marker.push_str(&format!(" {}| ", line_ix + 1));
         print!("{}", BrightYellow.paint(&line_marker[..]));
         print!("{}", lines[line_ix]);
-        print!("\n");
-    }
+        println!();
+    });
     if span.single_line() {
         for _ in 0..line_marker.len() - 1 {
             print!(" ");
@@ -119,11 +119,11 @@ fn format_error_source(span: &Span, lines: &Vec<&str>) {
         for _ in 0..(stop.ch - start.ch - 1) {
             print!("{}", BrightRed.paint("-"));
         }
-        print!("\n");
+        println!();
     }
 }
 
-pub fn from_parse_error<'a>(error: &ParseResult<Node<'a>>) -> CompileError {
+pub fn from_parse_error(error: &ParseResult<Node<'_>>) -> CompileError {
     match error {
         &ParseResult::Error(ref info, err) => {
             let start = Pos {
@@ -146,7 +146,7 @@ pub fn from_parse_error<'a>(error: &ParseResult<Node<'a>>) -> CompileError {
 }
 
 pub fn report_errors(errors: &Vec<CompileError>, path: &str, source: &str) {
-    let lines: Vec<&str> = source.split("\n").collect();
+    let lines: Vec<&str> = source.split('\n').collect();
     let open = format!("\n----------------------------------------- {}\n", path);
     let close = "-".repeat(open.len() - 2);
     println!("{}", BrightCyan.paint(&open));

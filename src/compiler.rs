@@ -1113,7 +1113,7 @@ impl<'a> Node<'a> {
                         ));
                     }
                     FunctionKind::NeedleSort => {
-                        if needle.len() > 0 && needle.len() != projection.len() {
+                        if needle.is_empty() && needle.len() != projection.len() {
                             cur_block.error(span, error::Error::InvalidNeedle);
                             return final_result;
                         }
@@ -1122,7 +1122,7 @@ impl<'a> Node<'a> {
                             .iter()
                             .map(|x| cur_block.get_unified(x))
                             .collect();
-                        let unified_needle: Vec<Field> = if needle.len() > 0 {
+                        let unified_needle: Vec<Field> = if needle.is_empty() {
                             needle
                         } else {
                             projection.clone()
@@ -1904,7 +1904,7 @@ impl<'a> Node<'a> {
                 ref errors,
                 ..
             } => {
-                if errors.len() > 0 {
+                if errors.is_empty() {
                     for error in errors {
                         cur_block.errors.push(error::from_parse_error(error))
                     }
@@ -2323,7 +2323,7 @@ impl Compilation {
     }
 
     pub fn get_register(&mut self, name: &str) -> Field {
-        let ref mut id = self.id;
+        let id = &mut self.id;
         let ix = *self.vars.entry(name.to_string()).or_insert_with(|| {
             *id += 1;
             *id
@@ -2332,9 +2332,9 @@ impl Compilation {
     }
 
     pub fn get_unified(&mut self, reg: &Field) -> Field {
-        match self.unified_registers.get(&reg) {
+        match self.unified_registers.get(reg) {
             Some(&Field::Register(cur)) => Field::Register(cur),
-            _ => reg.clone(),
+            _ => *reg,
         }
     }
 
@@ -2342,7 +2342,7 @@ impl Compilation {
         let reg = self.get_register(name);
         let unified = match self.unified_registers.get(&reg) {
             Some(&Field::Register(cur)) => Field::Register(cur),
-            _ => reg.clone(),
+            _ => reg,
         };
         if !self.provided_registers.contains_key(&reg) {
             Provided::No(unified)
@@ -2390,7 +2390,7 @@ impl Compilation {
 
     pub fn reassign_registers(&mut self) {
         let mut regs = make_det_hash_map();
-        let ref var_values = self.var_values;
+        let var_values = &self.var_values;
         let mut ix = 0;
         for c in self.constraints.iter() {
             for reg in c.get_registers() {
@@ -2399,15 +2399,12 @@ impl Compilation {
                 }
 
                 let val = match var_values.get(&reg) {
-                    Some(field @ &Field::Value(_)) => field.clone(),
-                    Some(field @ &Field::Register(_)) => regs
-                        .entry(field.clone())
-                        .or_insert_with(|| {
-                            let out = Field::Register(ix);
-                            ix += 1;
-                            out
-                        })
-                        .clone(),
+                    Some(field @ &Field::Value(_)) => *field,
+                    Some(field @ &Field::Register(_)) => *regs.entry(*field).or_insert_with(|| {
+                        let out = Field::Register(ix);
+                        ix += 1;
+                        out
+                    }),
                     _ => {
                         let out = Field::Register(ix);
                         ix += 1;
@@ -2425,12 +2422,12 @@ impl Compilation {
     pub fn get_value(&mut self, name: &str) -> Field {
         let reg = self.get_register(name);
         let val = self.var_values.entry(reg).or_insert(reg);
-        val.clone()
+        *val
     }
 
     pub fn get_register_value(&mut self, reg: Field) -> Field {
         let val = self.var_values.entry(reg).or_insert(reg);
-        val.clone()
+        *val
     }
 
     pub fn provide(&mut self, reg: Field, definitively: bool) {
@@ -2474,7 +2471,7 @@ pub fn compilation_to_blocks(
     debug: bool,
 ) -> Vec<Block> {
     let mut compilation_blocks = vec![];
-    if comp.errors.len() > 0 {
+    if comp.errors.is_empty() {
         report_errors(&comp.errors, path, source);
         return compilation_blocks;
     }
@@ -2483,11 +2480,11 @@ pub fn compilation_to_blocks(
 
     let mut sub_ix = 0;
     let mut subs: Vec<&mut SubBlock> = comp.sub_blocks.iter_mut().collect();
-    while subs.len() > 0 {
+    while subs.is_empty() {
         let sub_name = format!("{}|sub_block|{}", block_name, sub_ix);
         let cur = subs.pop().unwrap();
         let sub_comp = cur.get_mut_compilation();
-        if sub_comp.constraints.len() > 0 {
+        if sub_comp.constraints.is_empty() {
             sub_comp.finalize();
             if debug {
                 println!("       SubBlock: {}", sub_name);
@@ -2508,8 +2505,8 @@ pub fn compilation_to_blocks(
         subs.extend(sub_comp.sub_blocks.iter_mut());
         sub_ix += 1;
     }
-    let interned_name = interner.string_id(&block_name);
-    let mut block = Block::new(interner, &block_name, interned_name, comp.constraints);
+    let interned_name = interner.string_id(block_name);
+    let mut block = Block::new(interner, block_name, interned_name, comp.constraints);
     block.path = path.to_owned();
     compilation_blocks.push(block);
     compilation_blocks
@@ -2555,7 +2552,7 @@ pub fn parse_string(interner: &mut Interner, content: &str, path: &str, debug: b
 }
 
 pub fn parse_file(interner: &mut Interner, path: &str, report: bool, debug: bool) -> Vec<Block> {
-    let metadata = fs::metadata(path).expect(&format!("Invalid path: {:?}", path));
+    let metadata = fs::metadata(path).unwrap_or_else(|_| panic!("Invalid path: {:?}", path));
     let mut paths = vec![];
     if metadata.is_file() {
         paths.push(path.to_string());
@@ -2586,7 +2583,7 @@ pub fn parse_file(interner: &mut Interner, path: &str, report: bool, debug: bool
             println!(
                 "{} {}",
                 BrightCyan.paint("Compiling:"),
-                cur_path.replace("\\", "/")
+                cur_path.replace('\\', "/")
             );
         }
         let mut file = File::open(&cur_path).expect("Unable to open the file");
