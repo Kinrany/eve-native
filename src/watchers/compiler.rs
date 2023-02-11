@@ -430,7 +430,7 @@ impl Watcher for CompilerWatcher {
                     if let Some(params) = self.constraint_to_params.get(&(*block, *id)) {
                         let block_type = self.block_type(*block, interner);
                         if let Some(compiled) =
-                            self.compile_constraint(params.clone(), interner, block_type)
+                            self.compile_constraint(params, interner, block_type)
                         {
                             self.constraints.insert((*block, *id), compiled);
                         }

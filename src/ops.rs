@@ -143,7 +143,7 @@ impl Change {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct RawChange {
     pub e: Internable,
     pub a: Internable,
@@ -173,6 +173,12 @@ impl RawChange {
             transaction: 0,
             count: self.count,
         }
+    }
+}
+
+impl PartialOrd for RawChange {
+    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -534,20 +540,20 @@ impl EstimateIter {
 
 pub enum OutputingIter {
     Empty,
-    Single(usize, Box<Iterator<Item = Interned>>),
-    Multi(Vec<usize>, Box<Iterator<Item = Vec<Interned>>>),
+    Single(usize, Box<dyn Iterator<Item = Interned>>),
+    Multi(Vec<usize>, Box<dyn Iterator<Item = Vec<Interned>>>),
 }
 
 impl OutputingIter {
     pub fn make_ptr<'a>(
-        value: Box<Iterator<Item = Interned> + 'a>,
-    ) -> Box<Iterator<Item = Interned> + 'static> {
+        value: Box<dyn Iterator<Item = Interned> + 'a>,
+    ) -> Box<dyn Iterator<Item = Interned> + 'static> {
         unsafe { mem::transmute(value) }
     }
 
     pub fn make_multi_ptr<'a>(
-        value: Box<Iterator<Item = Vec<Interned>> + 'a>,
-    ) -> Box<Iterator<Item = Vec<Interned>> + 'static> {
+        value: Box<dyn Iterator<Item = Vec<Interned>> + 'a>,
+    ) -> Box<dyn Iterator<Item = Vec<Interned>> + 'static> {
         unsafe { mem::transmute(value) }
     }
 

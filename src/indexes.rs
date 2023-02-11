@@ -36,9 +36,7 @@ pub fn ensure_len(vec: &mut Vec<i32>, len: usize) {
 pub fn get_delta(last: i32, next: i32) -> i32 {
     if last == 0 && next > 0 {
         1
-    } else if last > 0 && next == 0 {
-        -1
-    } else if last > 0 && next < 0 {
+    } else if last > 0 && next <= 0 {
         -1
     } else if last < 0 && next > 0 {
         1
@@ -92,7 +90,7 @@ impl HashIndexLeaf {
         }
     }
 
-    pub fn iter<'a>(&'a self) -> Box<ExactSizeIterator<Item = Interned> + 'a> {
+    pub fn iter<'a>(&'a self) -> Box<dyn ExactSizeIterator<Item = Interned> + 'a> {
         match self {
             &HashIndexLeaf::Single(value) => Box::new(iter::once(value)),
             &HashIndexLeaf::Many(ref index) => Box::new(index.keys().cloned()),
@@ -186,7 +184,7 @@ impl HashIndexLevel {
     pub fn find_values<'a>(
         &'a self,
         e: Interned,
-    ) -> Option<Box<ExactSizeIterator<Item = Interned> + 'a>> {
+    ) -> Option<Box<dyn ExactSizeIterator<Item = Interned> + 'a>> {
         match self.e.get(&e) {
             Some(leaf) => Some(leaf.iter()),
             None => None,
@@ -196,7 +194,7 @@ impl HashIndexLevel {
     pub fn find_entities<'a>(
         &'a self,
         v: Interned,
-    ) -> Option<Box<ExactSizeIterator<Item = Interned> + 'a>> {
+    ) -> Option<Box<dyn ExactSizeIterator<Item = Interned> + 'a>> {
         match self.v.get(&v) {
             Some(leaf) => Some(leaf.iter()),
             None => None,
@@ -207,7 +205,7 @@ impl HashIndexLevel {
         &'a self,
         e: Interned,
         v: Interned,
-    ) -> Option<Box<ExactSizeIterator<Item = Interned> + 'a>> {
+    ) -> Option<Box<dyn ExactSizeIterator<Item = Interned> + 'a>> {
         if e > 0 {
             // println!("here looking for v {:?}", e);
             self.find_values(e)
@@ -506,7 +504,7 @@ impl HashIndex {
         e: Interned,
         a: Interned,
         v: Interned,
-    ) -> Option<Box<ExactSizeIterator<Item = Interned> + 'a>> {
+    ) -> Option<Box<dyn ExactSizeIterator<Item = Interned> + 'a>> {
         if a == 0 {
             if self.a.len() > 0 {
                 Some(Box::new(self.a.keys().cloned()))
@@ -1537,11 +1535,11 @@ impl CollapsedChanges {
         };
     }
 
-    pub fn iter<'a>(&'a self) -> Box<Iterator<Item = &'a Change> + 'a> {
+    pub fn iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a Change> + 'a> {
         Box::new(self.changes.values().filter(|x| x.count != 0))
     }
 
-    pub fn drain<'a>(&'a mut self) -> Box<Iterator<Item = Change> + 'a> {
+    pub fn drain<'a>(&'a mut self) -> Box<dyn Iterator<Item = Change> + 'a> {
         Box::new(self.changes.drain().map(|kv| kv.1).filter(|x| x.count != 0))
     }
 
