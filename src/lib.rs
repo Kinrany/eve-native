@@ -1,7 +1,4 @@
-#![feature(slice_patterns)]
 #![feature(box_patterns)]
-#![feature(conservative_impl_trait)]
-#![feature(slice_concat_ext)]
 
 // #[link_args = "-s EXPORTED_FUNCTIONS=['_coolrand','_makeIter','_next']"]
 extern "C" {}
