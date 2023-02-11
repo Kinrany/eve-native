@@ -274,7 +274,7 @@ impl Watcher for CompilerWatcher {
                         self.block_to_constraints
                             .get_mut(&block)
                             .unwrap()
-                            .remove_item(&id);
+                            .remove(id as usize);
                         damaged_blocks.insert(block);
                         damaged_constraints.insert(id);
                     }

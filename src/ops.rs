@@ -3972,7 +3972,7 @@ pub struct Program {
 }
 
 impl Program {
-    pub fn new(name: &str) -> Program {
+    pub fn new() -> Program {
         let index = HashIndex::new();
         let distinct_index = DistinctIndex::new();
         let remote_index = RemoteIndex::new();
@@ -4007,13 +4007,19 @@ impl Program {
             blocks,
         };
         Program {
-            name: name.to_owned(),
+            name: "program".into(),
             state,
             block_info,
             watchers,
             incoming,
             outgoing,
         }
+    }
+
+    #[must_use]
+    pub fn with_name(mut self, name: impl Into<String>) -> Self {
+        self.name = name.into();
+        self
     }
 
     pub fn clear(&mut self) {
@@ -5362,7 +5368,7 @@ impl ProgramRunner {
         ProgramRunner {
             name: name.to_owned(),
             paths: vec![],
-            program: Program::new(name),
+            program: Program::new().with_name(name),
             persistence_channel: None,
             initial_commits: vec![],
             debug_modes: HashSet::new(),

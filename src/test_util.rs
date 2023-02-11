@@ -37,7 +37,7 @@ macro_rules! valid (($blocks:tt) => ({
 
 #[macro_export]
 macro_rules! blocks (($info:tt) => ({
-    let mut program = Program::new("test");
+    let mut program = Program::new().with_name("test");
     // @FIXME: any occurrence of search/commit/etc. will be replaced here...
     let stringy = stringify!($info).replace("\n", " ")
         .replace("# ", "#")

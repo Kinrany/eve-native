@@ -9,7 +9,7 @@ use eve::parser::*;
 //--------------------------------------------------------------------
 
 macro_rules! parse_blocks (($info:tt) => ({
-    let mut program = Program::new("parser test");
+    let mut program = Program::new().with_name("parser test");
     let stringy = stringify!($info).replace("# ", "#")
         .replace("search", "\nsearch")
         .replace("commit", "\ncommit")
